@@ -32,8 +32,8 @@ maintainers:
   - name: "escemi"
     email: "contact@escemi.com"
 
-dependencies:
-  - name: mariadb
-    repository: https://charts.bitnami.com/bitnami
-    version: 16.*.*
-    condition: mariadb.enabled
+# dependencies:
+#   - name: mariadb
+#     repository: https://charts.bitnami.com/bitnami
+#     version: 16.*.*
+#     condition: mariadb.enabled

@@ -1,0 +1,51 @@
+{{- if .Values.mariadb.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "postal.fullname" . }}-mariadb
+  labels:
+    app: mariadb
+spec:
+  serviceName: {{ include "postal.fullname" . }}-mariadb
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mariadb
+  template:
+    metadata:
+      labels:
+        app: mariadb
+    spec:
+      containers:
+      - name: mariadb
+        image: "{{ .Values.mariadb.image.registry }}/{{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}"
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.global.existingSecretName | default .Values.global.secretName }}
+              key: {{ .Values.mariadb.auth.secretKeys.rootPassword | default "mariadb-root-password" }}
+        - name: MYSQL_DATABASE
+          value: {{ .Values.mariadb.auth.database | quote }}
+        - name: MYSQL_USER
+          value: {{ .Values.mariadb.auth.username | quote }}
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.global.existingSecretName | default .Values.global.secretName }}
+              key: {{ .Values.mariadb.auth.secretKeys.password | default "mariadb-password" }}
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/mysql
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.mariadb.primary.persistence.size | default "8Gi" }}
+{{- end }}
