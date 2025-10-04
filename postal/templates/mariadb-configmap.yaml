@@ -1,0 +1,13 @@
+{{- if and .Values.mariadb.enabled .Values.mariadb.initdbScripts }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "postal.fullname" . }}-mariadb-init
+  labels:
+    app: mariadb
+data:
+{{- range $key, $value := .Values.mariadb.initdbScripts }}
+  {{ $key }}: |
+{{ $value | indent 4 }}
+{{- end }}
+{{- end }}

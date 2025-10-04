@@ -40,6 +40,16 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /var/lib/mysql
+        {{- if .Values.mariadb.initdbScripts }}
+        - name: init-scripts
+          mountPath: /docker-entrypoint-initdb.d
+        {{- end }}
+      {{- if .Values.mariadb.initdbScripts }}
+      volumes:
+      - name: init-scripts
+        configMap:
+          name: {{ include "postal.fullname" . }}-mariadb-init
+      {{- end }}
   volumeClaimTemplates:
   - metadata:
       name: data
