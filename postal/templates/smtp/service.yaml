@@ -11,9 +11,18 @@ metadata:
 spec:
   type: {{ .Values.smtp.service.type }}
   ports:
-    - port: {{ .Values.smtp.service.port }}
+  {{- if .Values.smtp.service.ports }}
+  {{- range .Values.smtp.service.ports }}
+    - port: {{ .port }}
+      targetPort: {{ .port }}
+      protocol: {{ .protocol | default "TCP" }}
+      name: {{ .name }}
+  {{- end }}
+  {{- else }}
+    - port: {{ .Values.smtp.service.port | default 25 }}
       targetPort: 25
       protocol: TCP
       name: smtp
+  {{- end }}
   selector:
     {{- include "postal.smtp.selectorLabels" . | nindent 4 }}
